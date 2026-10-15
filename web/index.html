@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小说 AI 痕迹体检 · 中文网文写作助手</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">✒</span>
+    <div>
+      <h1>小说 AI 痕迹体检 <span class="ver">v0.1</span></h1>
+      <p class="sub">中文网文 · 写作质量自查 · 纯离线</p>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="analyze">文本体检</button>
+    <button class="tab" data-view="rules">平台规则</button>
+    <button class="tab" data-view="about">说明与边界</button>
+  </nav>
+</header>
+
+<div class="disclaimer-bar">
+  ⚠️ 本工具是<b>写作质量体检</b>：帮你发现文本中的 AI 痕迹、给出<b>提升文学质量</b>的方向。
+  <b>不提供代写</b>，<b>不提供「降低 AI 检测率 / 规避平台审核」的功能</b>，不承诺通过任何平台审核。
+  判据来自公开文献与行业经验，<b>不是任何平台的官方标准</b>；结果是概率性信号，非定案证据。
+</div>
+
+<main>
+
+<!-- ================= 文本体检 ================= -->
+<section id="view-analyze" class="view active">
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>粘贴 / 拖入 你的小说章节</h2>
+      <span id="statLine" class="muted">0 字</span>
+    </div>
+
+    <div id="dropZone" class="drop-zone">
+      <div class="drop-icon">📖</div>
+      <div class="drop-text">
+        <b>把文档拖到这里</b>，或 <span class="drop-link">点击选择文件</span>
+      </div>
+      <div class="drop-hint">支持 .txt · .md · .docx · .html（≤20MB）· 建议单章 1000 字以上</div>
+      <input type="file" id="fileInput" accept=".txt,.md,.markdown,.docx,.html,.htm,.rtf,.log" hidden>
+    </div>
+
+    <div id="fileMeta" class="file-meta hidden">
+      <span class="fm-name" id="fmName"></span>
+      <span class="fm-info" id="fmInfo"></span>
+      <button id="fmClear" class="fm-clear" title="移除文件">×</button>
+    </div>
+
+    <textarea id="inputText" placeholder="在此粘贴小说正文（建议单章 1000 字以上，越长越准）……
+
+例：
+　　林昭把剑收回鞘中，转身望向山下的雾海。
+　　「你当真要走？」
+　　他没有回头，只淡淡说了三个字：「不必送。」"></textarea>
+
+    <div class="actions">
+      <button id="btnAnalyze" class="btn-primary" disabled>开始体检</button>
+      <button id="btnClear" class="btn-ghost">清空</button>
+      <label class="chk"><input type="checkbox" id="chkDialogue" checked> 对话分析</label>
+      <label class="chk"><input type="checkbox" id="chkStructure" checked> 结构 / 水文</label>
+      <label class="chk"><input type="checkbox" id="chkConsistency" checked> 叙事一致性</label>
+      <label class="chk"><input type="checkbox" id="chkFormat" checked> 格式合规</label>
+    </div>
+  </div>
+
+  <!-- 报告 -->
+  <div id="report" class="hidden">
+
+    <div class="panel score-panel">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-num" id="scoreNum">--</div>
+        <div class="score-label" id="scoreLabel">未分析</div>
+      </div>
+      <div class="score-side">
+        <h3 id="scoreTitle">AI 痕迹强度</h3>
+        <p id="scoreDesc" class="muted">体检结果会显示在这里。</p>
+        <div class="score-meta" id="scoreMeta"></div>
+      </div>
+    </div>
+
+    <div id="signalCards" class="signal-grid"></div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>逐句改写建议</h2><span class="muted" id="editCount"></span></div>
+      <div id="lineEdits" class="line-edits"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>问题归类与修改方向</h2></div>
+      <div id="suggestions" class="suggestions"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>定位到具体段落</h2><span class="muted">按痕迹强度排序</span></div>
+      <div id="hotspots" class="hotspots"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= 平台规则 ================= -->
+<section id="view-rules" class="view">
+  <div class="panel">
+    <div class="panel-head"><h2>主流平台 AI / 低质内容规则</h2></div>
+    <div id="rulesBody" class="doc-body"></div>
+  </div>
+</section>
+
+<!-- ================= 说明与边界 ================= -->
+<section id="view-about" class="view">
+  <div class="panel">
+    <div class="panel-head"><h2>这个工具能做什么、不能做什么</h2></div>
+    <div class="doc-body">
+      <h3>它能做</h3>
+      <ul>
+        <li>用统计与结构特征，指出文本中「像 AI 写」的地方，并给出<b>具体的修改方向</b>；</li>
+        <li>覆盖平台公告中提到的低质类型：行文机械、空洞水文、结构失常、格式混乱、前后文脱节等；</li>
+        <li>全程离线运行，<b>正文不上传、不外发</b>。</li>
+      </ul>
+
+      <h3>它不能做</h3>
+      <ul>
+        <li><b>不能判定</b>「这篇是不是 AI 写的」——只给痕迹强度，不给定性结论；</li>
+        <li><b>不能保证</b>通过任何平台的审核，也<b>不提供</b>「降低 AI 检测率」的功能；</li>
+        <li><b>不能替代编辑与读者</b>——最终判断权在人。</li>
+      </ul>
+
+      <h3>判据来源</h3>
+      <p>
+        ① 《人工智能生成合成内容标识办法》（2025-09-01 施行）第六条第三款：
+        「检测到显式标识或者<b>其他生成合成痕迹</b>的，识别为<b>疑似</b>生成合成内容」；
+        ② 《网络文学行业反洗稿自律公约》（2025-04-28，16 家平台）；
+        ③ 起点中文网 / 番茄小说 / 晋江文学城 的公开公告；
+        ④ 一线作者与编辑公开谈到的可观测痕迹。
+      </p>
+
+      <h3>法律边界（红线）</h3>
+      <p class="warn-text">
+        《人工智能生成合成内容标识办法》<b>第十条</b>：禁止恶意删除、篡改、伪造、隐匿生成合成内容标识，
+        <b>禁止为他人实施上述行为提供工具或者服务</b>。
+        因此本工具<b>只给「提升文学质量」的建议</b>，不给「规避检测」的手段。
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  纯前端离线工具 · 正文不上传 · 判据为启发式推断，非平台官方标准
+</footer>
+
+<script src="assets/vendor/jszip.min.js"></script>
+<script src="assets/novel_stylometry.js"></script>
+<script src="assets/dialogue.js"></script>
+<script src="assets/structure.js"></script>
+<script src="assets/consistency.js"></script>
+<script src="assets/format.js"></script>
+<script src="assets/suggest.js"></script>
+<script src="assets/platform_rules.js"></script>
+<script src="assets/report.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
